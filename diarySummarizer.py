@@ -33,11 +33,16 @@ referances:
 		https://qiita.com/masaru/items/5ebf2e96d6524830511b
 	comment
 		https://qiita.com/simonritchie/items/49e0813508cad4876b5a
+	sort
+		https://note.nkmk.me/python-list-sort-sorted/
+	sorting technic for Hash-Array
+		https://qiita.com/yousuke_yamaguchi/items/23014a3c8d8beb8ba073
 """
 
 import glob
 import re
 import os
+from pprint import pprint
 
 class DiarySummarizer:
 	def fileAppend(self, filePath, appendStr):
@@ -71,7 +76,7 @@ class DiarySummarizer:
 		Returns
 		-------
 		fileHashArray: Array
-		    サマリ対象のメタ情報が入った構造体
+		    サマリ対象のメタ情報が入った構造体 (ソート済み)
 		"""
 
 		fileHashArray = []
@@ -84,6 +89,7 @@ class DiarySummarizer:
 				'month': '',
 				'day'  : '',
 				'dstPath': '',
+				'dateTimeForSortKey': 0,
 			}
 			# raw filepath (not usable on windows cli)
 			tmpHash['originalPath'] = v
@@ -96,10 +102,14 @@ class DiarySummarizer:
 			tmpHash['day']   = tmpName[3].split('.txt')[0].zfill(2)
 			# destination of summary texts
 			tmpHash['dstPath'] = f"{dstInput}/{tmpHash['year']}{tmpHash['month']}.txt"
+			tmpHash['dateTimeForSortKey'] = int(f"{tmpHash['year']}{tmpHash['month']}{tmpHash['day']}")
 			# commit
 			fileHashArray.append(tmpHash)
 
-		return fileHashArray
+		# sort technic
+		fileHashArraySorted = sorted(fileHashArray, key=lambda x:x['dateTimeForSortKey'])
+
+		return fileHashArraySorted
 
 	def initializeDestination(self, dstInput, fileHashArray):
 		"""
